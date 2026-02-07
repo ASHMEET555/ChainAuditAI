@@ -173,3 +173,262 @@ header {
     transform: translateX(0);
   }
 }
+
+/*-------Scanner specific css------*/
+.main-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr; /* 2/3 for Input, 1/3 for Output */
+  gap: 2rem;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+@media (max-width: 1024px) {
+  .main-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+h2 {
+  font-size: 1.1rem;
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--text-primary);
+}
+
+.model-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.model-card {
+  background: var(--bg-card);
+  border: 2px solid var(--border-color);
+  padding: 1rem;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.model-card:hover {
+  border-color: var(--text-secondary);
+}
+
+.model-card.active {
+  background: rgba(59, 130, 246, 0.1);
+  border-color: var(--accent-blue);
+}
+
+.model-name {
+  font-weight: bold;
+  margin-bottom: 5px;
+  display: block;
+}
+
+.model-desc {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+.form-card {
+  background: var(--bg-card);
+  padding: 1.5rem;
+  border-radius: 12px;
+  border: 1px solid var(--border-color);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.btn-analyze {
+  width: 100%;
+  margin-top: 2rem;
+  padding: 1rem;
+  background: var(--gradient-btn);
+  border: none;
+  border-radius: 8px;
+  color: white;
+  font-weight: bold;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: opacity 0.2s;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+}
+
+.btn-analyze:hover {
+  opacity: 0.9;
+}
+
+.btn-analyze:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* --- Results Panel --- */
+.result-placeholder {
+  height: 250px;
+  border: 2px dashed var(--border-color);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+.result-card {
+  padding: 1.5rem;
+  border-radius: 12px;
+  border: 2px solid transparent;
+  animation: fadeIn 0.5s ease-out;
+}
+
+.result-card.high-risk {
+  background: rgba(239, 68, 68, 0.1);
+  border-color: rgba(239, 68, 68, 0.5);
+}
+
+.result-card.low-risk {
+  background: rgba(34, 197, 94, 0.1);
+  border-color: rgba(34, 197, 94, 0.5);
+}
+
+.score-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.risk-badge {
+  padding: 4px 12px;
+  border-radius: 99px;
+  font-size: 0.75rem;
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
+.high-risk .risk-badge {
+  background: var(--accent-red);
+  color: white;
+}
+.low-risk .risk-badge {
+  background: var(--accent-green);
+  color: white;
+}
+
+.big-score {
+  font-size: 4rem;
+  font-weight: 800;
+  text-align: center;
+  line-height: 1;
+}
+
+.high-risk .big-score {
+  color: #fca5a5;
+}
+.low-risk .big-score {
+  color: #86efac;
+}
+
+.score-desc {
+  text-align: center;
+  color: var(--text-primary);
+  margin-bottom: 1.5rem;
+  font-size: 0.9rem;
+}
+
+.proof-box {
+  background: var(--bg-body);
+  padding: 0.8rem;
+  border-radius: 6px;
+  font-family: monospace;
+  font-size: 0.75rem;
+  color: var(--accent-blue);
+  word-break: break-all;
+  margin-bottom: 1.5rem;
+  border: 1px solid var(--border-color);
+}
+
+.btn-commit {
+  width: 100%;
+  padding: 0.8rem;
+  background: #334155;
+  border: 1px solid #475569;
+  color: white;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn-commit:hover {
+  background: #475569;
+}
+
+.signal-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.signal-card {
+  background: var(--bg-input);
+  border: 2px solid var(--border-color);
+  padding: 1.5rem;
+  border-radius: 12px;
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.2s ease;
+  opacity: 0.7;
+}
+
+.signal-card:hover {
+  opacity: 1;
+  transform: translateY(-2px);
+}
+
+.signal-card.fraud.active {
+  background: rgba(239, 68, 68, 0.1);
+  border-color: #ef4444; /* Red */
+  opacity: 1;
+  box-shadow: 0 0 15px rgba(239, 68, 68, 0.3);
+}
+
+.signal-card.legit.active {
+  background: rgba(34, 197, 94, 0.1);
+  border-color: #22c55e; /* Green */
+  opacity: 1;
+  box-shadow: 0 0 15px rgba(34, 197, 94, 0.3);
+}
+
+.signal-icon {
+  width: 40px;
+  height: 40px;
+  margin: 0 auto 10px auto;
+  display: block;
+}
+
+.hidden {
+  display: none;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
