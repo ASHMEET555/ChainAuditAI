@@ -1,0 +1,2 @@
+data/ecommerce_fraud.csv filter=lfs diff=lfs merge=lfs -text
+data/bank_fraud.csv filter=lfs diff=lfs merge=lfs -text
