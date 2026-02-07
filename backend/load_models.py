@@ -16,6 +16,8 @@ def load_model_bank():
     model = joblib.load(model_path)
     features = joblib.load(features_path)
 
+    return model, features
+
 def load_model_ecommerce():
     model_path = 'model_wts/ecommerce_model_weights.pkl'
     features_path = 'model_wts/ecommerce_model_features.pkl'
