@@ -2,7 +2,7 @@ import joblib
 import numpy as np
 import pandas as pd
 from typing import Dict, Tuple
-from math import ceil
+from math import ceil, exp
 from utils.load_models import (
     load_model_vehicle,
     load_model_bank,
@@ -73,7 +73,10 @@ class FraudDetectionService:
             
             # 6. Convert probability to score (0-100 continuous scale)
             # This gives a more robust and granular fraud score
-            fraud_score = ceil(fraud_probability * 100)
+            func = lambda x, n: 100 * (1 - (1 - x) ** n)
+
+            fraud_score = ceil(func(fraud_probability, 1.9))
+            
             
             return {
                 "fraud_score": fraud_score,
