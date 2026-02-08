@@ -84,8 +84,9 @@ async function fetchDashboardData() {
     if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
 
     const data = await response.json();
-    const records = data.records || [];
+    let records = data.records || [];
 
+    records.reverse();
     updateChartData(records);
 
     updateLiveFeed(records);
@@ -97,6 +98,7 @@ async function fetchDashboardData() {
 function updateChartData(records) {
   // Initialize 10 bins with 0
   const bins = Array(10).fill(0);
+  
 
   records.forEach((record) => {
     // Ensure score is within 0-100
@@ -165,9 +167,9 @@ function updateLiveFeed(records) {
                 <span style="
                     background: ${isFraud ? "rgba(239, 68, 68, 0.2)" : "rgba(34, 197, 94, 0.2)"};
                     color: ${isFraud ? "#f87171" : "#4ade80"};
-                    padding: 2px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: bold;
+                    padding: 2px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: bold; white-space: nowrap;
                 ">
-                    ${isFraud ? "BLOCKED" : "VERIFIED"} (Score: ${record.fraud_score})
+                    Score:${record.fraud_score}
                 </span>
             </div>
         `;
