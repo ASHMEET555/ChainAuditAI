@@ -42,23 +42,33 @@ class FraudDetectionService:
         Returns only the fraud score (0 or 100) and status.
         """
         if transaction_type not in self.models:
-            raise ValueError(f"Unknown transaction type: {transaction_type}")
+            raise ValueError(f"Unknown transaction_type: {transaction_type}")
         
         try:
-            # 1. Unpack model and feature list (handle None for Ethereum)
-            model, features = self.models[transaction_type]
+            # 1. Unpack model and feature list
+            model, expected_features = self.models[transaction_type]
             transform_fn = self.transforms[transaction_type]
             
             # 2. Convert to DataFrame
             df = pd.DataFrame([transaction_data])
             
-            # 3. Transform data (passing features ensures correct columns)
-            transformed_data = transform_fn(df, features)
+            # 3. Transform data (pass None to get all transformed features)
+            transformed_data = transform_fn(df, selected_features=None)
             
-            # 4. Get binary prediction (0 or 1)
+            # 4. Reorder columns to match model expectations
+            if expected_features is not None:
+                # Ensure all expected features exist (add missing as 0)
+                for feature in expected_features:
+                    if feature not in transformed_data.columns:
+                        transformed_data[feature] = 0
+                
+                # Select only expected features in correct order
+                transformed_data = transformed_data[expected_features]
+            
+            # 5. Get binary prediction (0 or 1)
             raw_prediction = int(model.predict(transformed_data)[0])
             
-            # 5. Calculate Score (Strict Binary: 0 or 100)
+            # 6. Calculate Score (Strict Binary: 0 or 100)
             fraud_score = raw_prediction * 100
             
             return {
@@ -69,6 +79,8 @@ class FraudDetectionService:
         
         except Exception as e:
             print(f"Error in detect_fraud for {transaction_type}: {str(e)}")
+            import traceback
+            traceback.print_exc()
             return {
                 "fraud_score": 0,
                 "transaction_type": transaction_type,

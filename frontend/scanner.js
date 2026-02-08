@@ -1,7 +1,7 @@
 // ===============================
 // CONFIG
 // ===============================
-const API_BASE_URL = "http://localhost:5000/api";
+const API_BASE_URL = "http://localhost:8000";
 
 
 // ===============================
@@ -14,6 +14,39 @@ let state = {
     lastResult: null
 };
 
+
+
+// ===============================
+// RENDER RESULTS
+// ===============================
+function renderResults(data) {
+    // ... (keep variable declarations) ...
+
+    placeholder.classList.add("hidden");
+    resultCard.classList.remove("hidden");
+    resultCard.classList.remove("high-risk", "low-risk");
+
+    // FIX 4: Update logic to use the mapped data
+    // Use the risk_level we calculated above
+    if (data.risk_level === "HIGH") {
+        resultCard.classList.add("high-risk");
+        riskBadge.innerText = "FRAUD DETECTED";
+        riskBadge.style.background = "#ef4444";
+        scoreValue.style.color = "#fca5a5";
+    } else {
+        resultCard.classList.add("low-risk");
+        riskBadge.innerText = "LEGITIMATE";
+        riskBadge.style.background = "#22c55e";
+        scoreValue.style.color = "#86efac";
+    }
+
+    // Backend data
+    scoreValue.innerText = data.score;
+    scoreText.innerText = data.message;
+    proofHash.innerText = data.proof_hash;
+
+    // ... (keep commit button logic) ...
+}
 
 // ===============================
 // MODEL SELECTION
@@ -83,7 +116,7 @@ async function runAnalysis() {
     `;
 
     try {
-        const response = await fetch(`${API_BASE_URL}/analyze`, {
+        const response = await fetch(`${API_BASE_URL}/test/run-test`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",

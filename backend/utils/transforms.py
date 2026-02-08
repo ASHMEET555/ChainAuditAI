@@ -244,9 +244,12 @@ def transform_ethereum_fraud_data(raw_data, selected_features=None):
     
     # ===== STEP 8: FEATURE SELECTION =====
     if selected_features is not None:
+        # Ensure all required features exist
         missing_features = set(selected_features) - set(df.columns)
         for feature in missing_features:
             df[feature] = 0
+        
+        # Select ONLY the required features in the EXACT order
         df = df[selected_features]
     
     return df
@@ -336,14 +339,12 @@ def transform_ecommerce_fraud_data(raw_data, selected_features=None):
     
     # ===== STEP 10: FEATURE SELECTION (CRITICAL) =====
     if selected_features is not None:
-        # Add missing features as 0
-        missing_features = list(set(selected_features) - set(df.columns))
-        if missing_features:
-            df_missing = pd.DataFrame(0, index=df.index, columns=missing_features)
-            df = pd.concat([df, df_missing], axis=1)
+        # Ensure all required features exist
+        missing_features = set(selected_features) - set(df.columns)
+        for feature in missing_features:
+            df[feature] = 0
         
-        # Force select only required features in correct order
-        # This will silently drop 'Account Age Days' if it wasn't dropped in step 9
+        # Select ONLY the required features in the EXACT order
         df = df[selected_features]
     
     return df
@@ -543,9 +544,12 @@ def transform_bank_fraud_data(raw_data, selected_features=None):
     
     # ===== STEP 17: FEATURE SELECTION =====
     if selected_features is not None:
+        # Ensure all required features exist
         missing_features = set(selected_features) - set(df.columns)
         for feature in missing_features:
             df[feature] = 0
+        
+        # Select ONLY the required features in the EXACT order
         df = df[selected_features]
     
     return df

@@ -20,20 +20,24 @@ def get_model_path(filename):
 
 def load_model_vehicle():
     model = joblib.load(get_model_path('vehicle_model_weights.pkl'))
-    features = load_features('vehicle_model_features.pkl')
+    # Extract feature names from the trained model
+    features = model.feature_names_in_.tolist() if hasattr(model, 'feature_names_in_') else None
     return model, features
 
 def load_model_bank():
     model = joblib.load(get_model_path('bank_model_weights.pkl'))
-    features = load_features('bank_model_features.pkl')
+    # Extract feature names from the trained model
+    features = model.feature_names_in_.tolist() if hasattr(model, 'feature_names_in_') else None
     return model, features
 
 def load_model_ecommerce():
     model = joblib.load(get_model_path('ecommerce_model_weights.pkl'))
-    features = load_features('ecommerce_model_features.pkl')
+    # Extract feature names from the trained model
+    features = model.feature_names_in_.tolist() if hasattr(model, 'feature_names_in_') else None
     return model, features
 
 def load_model_eth():
     model = joblib.load(get_model_path('ethereum_model_weights.pkl'))
-    # Ethereum model relies on numeric features only, no feature file needed
-    return model, None
+    # Extract feature names from the trained model
+    features = model.feature_names_in_.tolist() if hasattr(model, 'feature_names_in_') else None
+    return model, features

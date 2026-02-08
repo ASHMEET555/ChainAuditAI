@@ -23,9 +23,11 @@ class TestRequest(BaseModel):
     Frontend specifies:
     - transaction_type: Which model to use (vehicle, bank, ecommerce, ethereum)
     - fraud_label: "fraud" or "non-fraud" to select which subset to test
+    - num_samples: Number of samples to test (default 1)
     """
     transaction_type: str  # "vehicle", "bank", "ecommerce", or "ethereum"
     fraud_label: str  # "fraud" or "non-fraud"
+    num_samples: int = 1  # Default to 1 sample
 
 
 # ============= Output Schemas =============
@@ -171,8 +173,8 @@ def run_fraud_test(request: TestRequest):
         # Step 1: Load test data
         df = load_test_data(request.transaction_type)
         
-        # Step 2-3: Get 5 random rows (from 25 available per label)
-        random_rows = get_random_subset(df, request.fraud_label, n_samples=5)
+        # Step 2-3: Get random rows based on num_samples
+        random_rows = get_random_subset(df, request.fraud_label, n_samples=request.num_samples)
         
         if not random_rows:
             raise HTTPException(
@@ -198,8 +200,28 @@ def run_fraud_test(request: TestRequest):
             
             if not detection_result.get("success", False):
                 error_msg = detection_result.get('error', 'Unknown error')
-                print(f"Warning: Detection failed for row: {error_msg}")
+                print(f"ERROR: Detection failed for {request.transaction_type}")
+                print(f"Error message: {error_msg}")
                 print(f"Row data keys: {list(row_dict.keys())}")
+                print(f"Row data sample: {str(row_dict)[:200]}")
+                
+                # Still create a failed entry for tracking
+                fraud_log = FraudLog(
+                    tx_hash=f"test_failed_{datetime.now().timestamp()}_{random.randint(1000, 9999)}",
+                    transaction_type=request.transaction_type,
+                    fraud_score=0,  # Failed detection = 0 score
+                    model_version="v1_failed",
+                    transaction_data={"error": error_msg, "input": str(row_dict)[:500]}
+                )
+                db.add(fraud_log)
+                db.commit()
+                
+                results.append(TestResultItem(
+                    fraud_score=0,
+                    expected_fraud_label=expected_label,
+                    database_id=fraud_log.id,
+                    blockchain_tx=None
+                ))
                 continue
             
             # Step 5: Log to database
