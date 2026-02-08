@@ -75,8 +75,6 @@ async function fetchDashboardData() {
         const data = await response.json();
         const records = data.records || [];
 
-        updateMetrics(records);
-
         updateChartData(records);
 
         updateLiveFeed(records);
