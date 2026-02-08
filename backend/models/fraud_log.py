@@ -19,7 +19,7 @@ class FraudLog(Base):
     transaction_type = Column(String, index=True)  # vehicle, bank, ecommerce, ethereum
     
     # Fraud detection results
-    fraud_score = Column(Integer)  # 0-100
+    fraud_score = Column(Float)  # 0-100 (continuous probability-based score)
     # Model information
     model_version = Column(String)
     
