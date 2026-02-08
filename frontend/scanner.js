@@ -1,80 +1,30 @@
 // ===============================
 // CONFIG
 // ===============================
-const API_BASE_URL = "http://localhost:8000";
-
+const API_BASE_URL = "http://localhost:8000/test"; // Pointing to /test router
 
 // ===============================
 // GLOBAL STATE
 // ===============================
 let state = {
-    currentTransactionType: "vehicle", // default dataset
+    currentTransactionType: "vehicle",
     currentModel: "lightgbm",
-    currentSignal: null,               // 'fraud' or 'legit'
+    currentSignal: null,
     lastResult: null
 };
 
-
-
-// ===============================
-// RENDER RESULTS
-// ===============================
-function renderResults(data) {
-    // ... (keep variable declarations) ...
-
-    placeholder.classList.add("hidden");
-    resultCard.classList.remove("hidden");
-    resultCard.classList.remove("high-risk", "low-risk");
-
-    // FIX 4: Update logic to use the mapped data
-    // Use the risk_level we calculated above
-    if (data.risk_level === "HIGH") {
-        resultCard.classList.add("high-risk");
-        riskBadge.innerText = "FRAUD DETECTED";
-        riskBadge.style.background = "#ef4444";
-        scoreValue.style.color = "#fca5a5";
-    } else {
-        resultCard.classList.add("low-risk");
-        riskBadge.innerText = "LEGITIMATE";
-        riskBadge.style.background = "#22c55e";
-        scoreValue.style.color = "#86efac";
-    }
-
-    // Backend data
-    scoreValue.innerText = data.score;
-    scoreText.innerText = data.message;
-    proofHash.innerText = data.proof_hash;
-
-    // ... (keep commit button logic) ...
-}
-
-// ===============================
-// MODEL SELECTION
-// ===============================
+// ... (Select Model/Signal functions remain the same) ...
 function selectModel(card, modelId) {
-    document.querySelectorAll(".model-card")
-        .forEach(c => c.classList.remove("active"));
-
+    document.querySelectorAll(".model-card").forEach(c => c.classList.remove("active"));
     card.classList.add("active");
     state.currentModel = modelId;
-
-    console.log("[State] Model:", modelId);
 }
 
-
-// ===============================
-// SIGNAL SELECTION
-// ===============================
 function selectSignal(card, signalType) {
-    document.querySelectorAll(".signal-card")
-        .forEach(c => c.classList.remove("active"));
-
+    document.querySelectorAll(".signal-card").forEach(c => c.classList.remove("active"));
     card.classList.add("active");
     state.currentSignal = signalType;
-
-    console.log("[State] Signal:", signalType);
 }
-
 
 // ===============================
 // RUN ANALYSIS
@@ -89,13 +39,11 @@ async function runAnalysis() {
         return;
     }
 
-    // Payload sent to backend
+    // Correct Payload for TestRequest
     const payload = {
         transaction_type: state.currentTransactionType,
-        model_used: state.currentModel,
-        forced_signal: state.currentSignal,
         fraud_label: state.currentSignal === "fraud" ? "fraud" : "non-fraud",
-        timestamp: new Date().toISOString()
+        num_samples: 1 // Explicitly ask for 1 sample
     };
 
     // UI Loading State
@@ -105,18 +53,15 @@ async function runAnalysis() {
 
     resultCard.classList.add("hidden");
     placeholder.classList.remove("hidden");
-
     placeholder.innerHTML = `
         <div style="display:flex; flex-direction:column; align-items:center; gap:10px;">
             <div class="spinner"></div>
-            Sending <strong>${state.currentSignal.toUpperCase()}</strong> signal  
-            via <strong>${state.currentModel}</strong>  
-            (${state.currentTransactionType})
+            Processing <strong>${state.currentSignal.toUpperCase()}</strong> Transaction...
         </div>
     `;
 
     try {
-        const response = await fetch(`${API_BASE_URL}/test/run-test`, {
+        const response = await fetch(`${API_BASE_URL}/run-test`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -126,18 +71,23 @@ async function runAnalysis() {
         });
 
         if (!response.ok) {
-            throw new Error(response.statusText);
+            throw new Error(`Server Error: ${response.statusText}`);
         }
 
         const data = await response.json();
-        state.lastResult = data;
-
-        renderResults(data);
+        
+        // FIX: Extract the first result from the list
+        if (data.results && data.results.length > 0) {
+            const firstResult = data.results[0];
+            state.lastResult = firstResult;
+            renderResults(firstResult); // Pass the specific result item
+        } else {
+            throw new Error("No results returned from backend");
+        }
 
     } catch (error) {
         console.error("Analysis Error:", error);
-        placeholder.innerHTML = "Error connecting to backend.";
-        alert("Backend connection failed.");
+        placeholder.innerHTML = `<span style="color:red">Connection Failed: ${error.message}</span>`;
     } finally {
         analyzeBtn.innerText = "Broadcast Signal";
         analyzeBtn.disabled = false;
@@ -149,10 +99,9 @@ async function runAnalysis() {
 // ===============================
 // RENDER RESULTS
 // ===============================
-function renderResults(data) {
+function renderResults(result) {
     const placeholder = document.getElementById("placeholder");
     const resultCard = document.getElementById("resultCard");
-
     const riskBadge = document.getElementById("riskBadge");
     const scoreValue = document.getElementById("scoreValue");
     const scoreText = document.getElementById("scoreText");
@@ -161,11 +110,12 @@ function renderResults(data) {
 
     placeholder.classList.add("hidden");
     resultCard.classList.remove("hidden");
-
     resultCard.classList.remove("high-risk", "low-risk");
 
-    // Risk styling
-    if (data.risk_level === "HIGH" || state.currentSignal === "fraud") {
+    // Check Score (0-100)
+    const isHighRisk = result.fraud_score > 50;
+
+    if (isHighRisk) {
         resultCard.classList.add("high-risk");
         riskBadge.innerText = "FRAUD DETECTED";
         riskBadge.style.background = "#ef4444";
@@ -177,94 +127,38 @@ function renderResults(data) {
         scoreValue.style.color = "#86efac";
     }
 
-    // Backend data
-    scoreValue.innerText = data.score || "--";
-    scoreText.innerText = data.message || "Analysis complete.";
-    proofHash.innerText = data.proof_hash || "No hash returned";
+    // Display Backend Data
+    scoreValue.innerText = result.fraud_score;
+    scoreText.innerText = isHighRisk ? "High probability of fraud." : "Transaction appears safe.";
+    
+    // Display Blockchain Hash
+    if (result.blockchain_tx) {
+        proofHash.innerText = result.blockchain_tx;
+        proofHash.style.color = "#4ade80"; // Green for success
+    } else {
+        proofHash.innerText = "Failed to write to chain (Check Backend Logs)";
+        proofHash.style.color = "#f87171"; // Red for failure
+    }
 
-    // Enable commit
-    commitBtn.disabled = false;
-    commitBtn.innerHTML = `
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <polyline points="20 6 9 17 4 12"></polyline>
-        </svg>
-        Commit Proof to Chain
-    `;
+    // Disable manual commit since we do it automatically now
+    commitBtn.disabled = true;
+    commitBtn.innerText = "Auto-Logged to Chain";
     commitBtn.style.background = "#334155";
 }
 
-
-// ===============================
-// COMMIT TO LEDGER
-// ===============================
-async function commitToLedger() {
-    const commitBtn = document.getElementById("commitBtn");
-
-    if (!state.lastResult) {
-        alert("No analysis data to commit.");
-        return;
-    }
-
-    commitBtn.innerText = "Committing...";
-    commitBtn.disabled = true;
-    commitBtn.style.background = "#4f46e5";
-
-    try {
-        const response = await fetch(`${API_BASE_URL}/commit`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-                proof_hash: state.lastResult.proof_hash,
-                transaction_id: state.lastResult.transaction_id
-            })
-        });
-
-        if (!response.ok) {
-            throw new Error("Commit failed");
-        }
-
-        const data = await response.json();
-
-        commitBtn.innerText = "Proof On-Chain!";
-        commitBtn.style.background = "#22c55e";
-
-        alert(`Block #${data.block_number}\nTx: ${data.tx_hash}`);
-
-    } catch (error) {
-        console.error("Commit Error:", error);
-        alert("Commit failed.");
-
-        commitBtn.innerText = "Retry Commit";
-        commitBtn.disabled = false;
-        commitBtn.style.background = "#ef4444";
-    }
-}
-
-
-// ===============================
-// SPINNER STYLE
-// ===============================
+// ... (Spinner Styles) ...
 document.addEventListener("DOMContentLoaded", () => {
     const style = document.createElement("style");
     style.innerHTML = `
         .hidden { display: none; }
-
         .spinner {
-            width: 24px;
-            height: 24px;
+            width: 24px; height: 24px;
             border: 3px solid rgba(59, 130, 246, 0.3);
             border-radius: 50%;
             border-top-color: #3b82f6;
             animation: spin 1s linear infinite;
         }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
+        @keyframes spin { to { transform: rotate(360deg); } }
     `;
     document.head.appendChild(style);
-
-    console.log("Scanner ready. API:", API_BASE_URL);
 });
