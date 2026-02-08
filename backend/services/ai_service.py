@@ -2,17 +2,17 @@ import joblib
 import numpy as np
 import pandas as pd
 from typing import Dict, Tuple
-from load_models import (
+from utils.load_models import (
     load_model_vehicle,
     load_model_bank,
     load_model_ecommerce,
     load_model_eth
 )
-from transforms import (
+from utils.transforms import (
     transform_vehicle_fraud_data,
     transform_bank_fraud_data,
     transform_ecommerce_fraud_data,
-    transform_eth_fraud_data
+    transform_ethereum_fraud_data
 )
 
 
@@ -41,7 +41,7 @@ class FraudDetectionService:
             "vehicle": transform_vehicle_fraud_data,
             "bank": transform_bank_fraud_data,
             "ecommerce": transform_ecommerce_fraud_data,
-            "ethereum": transform_eth_fraud_data
+            "ethereum": transform_ethereum_fraud_data
         }
     
     def _convert_to_probability(self, prediction: int) -> float:
@@ -124,8 +124,8 @@ class FraudDetectionService:
             # Convert to DataFrame
             df = pd.DataFrame([transaction_data])
             
-            # Transform data
-            transformed_data = transform_fn(df, features)
+            # Transform data (features may be None, transformers handle it)
+            transformed_data = transform_fn(df, None)
             
             # Get prediction from model
             raw_prediction = model.predict(transformed_data)[0]

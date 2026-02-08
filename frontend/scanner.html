@@ -57,28 +57,28 @@
             <line x1="6" y1="6" x2="6.01" y2="6"></line>
             <line x1="6" y1="18" x2="6.01" y2="18"></line>
           </svg>
-          Step 1: Select AI Model
+          Step 1: Select Transaction Type
         </h2>
 
         <div class="model-grid" style="grid-template-columns: repeat(2, 1fr)">
           <div
             class="model-card active"
-            onclick="selectModel(this, 'lightgbm')"
+            onclick="selectModel(this, 'vehicle')"
           >
-            <span class="model-name">⚡ LightGBM</span>
-            <span class="model-desc">Gradient Boosting</span>
+            <span class="model-name">🚗 Vehicle</span>
+            <span class="model-desc">Insurance Fraud</span>
           </div>
-          <div class="model-card" onclick="selectModel(this, 'neural_net')">
-            <span class="model-name">🧠 Neural Net</span>
-            <span class="model-desc">Deep Learning</span>
+          <div class="model-card" onclick="selectModel(this, 'bank')">
+            <span class="model-name">🏦 Bank</span>
+            <span class="model-desc">Account Fraud</span>
           </div>
-          <div class="model-card" onclick="selectModel(this, 'iso_forest')">
-            <span class="model-name">🌲 Iso Forest</span>
-            <span class="model-desc">Anomaly Detect</span>
+          <div class="model-card" onclick="selectModel(this, 'ecommerce')">
+            <span class="model-name">🛒 E-Commerce</span>
+            <span class="model-desc">Transaction Fraud</span>
           </div>
-          <div class="model-card" onclick="selectModel(this, 'xgboost')">
-            <span class="model-name">🚀 XGBoost</span>
-            <span class="model-desc">High Performance</span>
+          <div class="model-card" onclick="selectModel(this, 'ethereum')">
+            <span class="model-name">⛓️ Ethereum</span>
+            <span class="model-desc">Blockchain Fraud</span>
           </div>
         </div>
 
@@ -146,7 +146,7 @@
           </div>
 
           <button class="btn-analyze" id="analyzeBtn" onclick="runAnalysis()">
-            Broadcast Signal to Backend
+            Run Fraud Detection Test
           </button>
         </div>
       </div>
