@@ -2,6 +2,7 @@ import joblib
 import numpy as np
 import pandas as pd
 from typing import Dict, Tuple
+from math import ceil
 from utils.load_models import (
     load_model_vehicle,
     load_model_bank,
@@ -65,11 +66,14 @@ class FraudDetectionService:
                 # Select only expected features in the EXACT order
                 transformed_data = transformed_data[expected_features]
             
-            # 5. Get binary prediction (0 or 1)
-            raw_prediction = int(model.predict(transformed_data)[0])
+            # 5. Get probability prediction (continuous score between 0 and 1)
+            # predict_proba returns [[prob_class_0, prob_class_1]]
+            # We want the probability of fraud (class 1), which is index [:, 1]
+            fraud_probability = model.predict_proba(transformed_data)[0, 1]
             
-            # 6. Calculate Score (Strict Binary: 0 or 100)
-            fraud_score = raw_prediction * 100
+            # 6. Convert probability to score (0-100 continuous scale)
+            # This gives a more robust and granular fraud score
+            fraud_score = ceil(fraud_probability * 100)
             
             return {
                 "fraud_score": fraud_score,
