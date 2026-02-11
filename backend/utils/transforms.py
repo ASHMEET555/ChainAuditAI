@@ -54,7 +54,7 @@ def transform_vehicle_fraud_data(raw_data, selected_features=None):
 
     # Drop Useless Columns
     drop_cols = ['Month', 'WeekOfMonth', 'DayOfWeek', 'DayOfWeekClaimed', 'WeekOfMonthClaimed', 'PolicyNumber']
-    df = df.drop(columns=[c for c in drop_cols if c in df.columns], axis=1)
+    df = df.drop(columns=[c for c in drop_cols if c in df.columns])
 
     # One-Hot Encoding
     onehot_cols = ['Make', 'MonthClaimed', 'MaritalStatus', 'PolicyType', 'VehicleCategory', 'RepNumber', 'Deductible', 'Days_Policy_Accident', 'Days_Policy_Claim', 'PastNumberOfClaims', 'AgeOfPolicyHolder', 'NumberOfSuppliments', 'AddressChange_Claim', 'NumberOfCars', 'Year']
@@ -89,7 +89,7 @@ def transform_ecommerce_fraud_data(raw_data, selected_features=None):
         df['Address Match'] = (df['Shipping Address'] == df['Billing Address']).astype(int)
     
     drop_cols = ['Transaction ID', 'Customer Location', 'Shipping Address', 'Billing Address']
-    df = df.drop(columns=[c for c in drop_cols if c in df.columns], axis=1)
+    df = df.drop(columns=[c for c in drop_cols if c in df.columns])
     
     cols_to_encode = [c for c in ['Payment Method', 'Product Category', 'Device Used'] if c in df.columns]
     if cols_to_encode:
@@ -163,7 +163,7 @@ def transform_ethereum_fraud_data(raw_data, selected_features=None):
     
     drop_cols = ['confirmations', 'variance_value_received', 'total_tx_sent_malicious', 
                  'total_tx_sent_unique', 'blockNumber', 'Month', 'Hour', 'Day', 'Fraud', 'ratio_malicious_sent']
-    df = df.drop(columns=[c for c in drop_cols if c in df.columns], axis=1)
+    df = df.drop(columns=[c for c in drop_cols if c in df.columns])
     
     if selected_features is not None:
         missing = list(set(selected_features) - set(df.columns))
