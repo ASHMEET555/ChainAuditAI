@@ -1,7 +1,7 @@
 // ===============================
 // CONFIG
 // ===============================
-const API_BASE_URL = "http://localhost:8000/test"; // Pointing to /test router
+const API_BASE_URL = "https://chainauditai.onrender.com/test"; // Pointing to /test router
 
 // ===============================
 // GLOBAL STATE

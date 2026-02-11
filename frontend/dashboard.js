@@ -1,4 +1,4 @@
-const API_BASE_URL = "http://localhost:8000";
+const API_BASE_URL = "https://chainauditai.onrender.com";
 
 const ctx = document.getElementById("trafficChart").getContext("2d");
 
