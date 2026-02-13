@@ -4,6 +4,7 @@
 
 ChainAuditAI is a hackathon project that combines **machine learning–based fraud detection** with **Ethereum blockchain** to create an immutable, verifiable audit trail of fraud decisions. Fraud detection happens **off‑chain** using trained AI models, while **cryptographic proof** of each decision is permanently recorded **on‑chain**, ensuring transparency, trust, and auditability.
 
+# 🔗 Live Demo: https://chainauditai.onrender.com/
 ---
 
 ## 🧠 Project Overview
